@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stack>
+#include <fstream>
 
 // Matriz de char representnado o labirinto
 char **maze; // Voce também pode representar o labirinto como um vetor de vetores de char (vector<vector<char>>)
@@ -60,8 +61,10 @@ pos_t load_maze(const char *file_name)
 		for (int j = 0; j < num_cols; ++j)
 		{
 			// Le o valor da linha i+1,j do arquivo e salva na posição maze[i][j]
+			maze[i][j] = fgetc(file);
 			// Se o valor for 'e' salvar o valor em initial_pos
 		}
+		fgetc(file);
 	}
 	return initial_pos;
 }
@@ -115,6 +118,7 @@ int main(int argc, char *argv[])
 {
 	// carregar o labirinto com o nome do arquivo recebido como argumento
 	pos_t initial_pos = load_maze(argv[1]);
+	print_maze();
 	// chamar a função de navegação
 	bool exit_found = walk(initial_pos);
 
