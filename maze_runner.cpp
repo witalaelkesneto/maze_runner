@@ -93,12 +93,12 @@ void print_maze()
 // Recebe como entrada a posição inicial e retorna um booleano indicando se a saída foi encontrada
 bool walk(pos_t pos)
 {
-
 	// Repita até que a saída seja encontrada ou não existam mais posições não exploradas
+
 	// Marcar a posição atual com o símbolo '.'
 	maze[pos.i][pos.j] = '.';
 	// Limpa a tela
-	std::this_thread::sleep_for(std::chrono::seconds(1));
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 	system("clear");
 	// Imprime o labirinto
 	print_maze();
@@ -113,36 +113,48 @@ bool walk(pos_t pos)
 			- pos.i-1, pos.j
 		Caso alguma das posiçÕes validas seja igual a 's', retornar verdadeiro
 	*/
-	if (pos.j + 1 <= 49)
+	if (pos.j + 1 <= num_rows)
 	{
 		if (maze[pos.i][pos.j + 1] == 'x')
 		{
-			valid_positions.push(pos);
+			valid_positions.push({pos.i, pos.j + 1});
 		}
 		else if (maze[pos.i][pos.j + 1] == 's')
 		{
 			return true;
 		}
 	}
-	if (pos.j - 1 >= 1)
+	if (pos.j - 1 >= 0)
 	{
 		if (maze[pos.i][pos.j - 1] == 'x')
 		{
-			valid_positions.push(pos);
+			valid_positions.push({pos.i, pos.j - 1});
+		}
+		else if (maze[pos.i][pos.j - 1] == 's')
+		{
+			return true;
 		}
 	}
-	if (pos.i + 1 <= 20)
+	if (pos.i + 1 <= num_cols)
 	{
 		if (maze[pos.i + 1][pos.j] == 'x')
 		{
-			valid_positions.push(pos);
+			valid_positions.push({pos.i + 1, pos.j});
+		}
+		else if (maze[pos.i + 1][pos.j] == 's')
+		{
+			return true;
 		}
 	}
 	if (pos.i - 1 >= 0)
 	{
 		if (maze[pos.i - 1][pos.j] == 'x')
 		{
-			valid_positions.push(pos);
+			valid_positions.push({pos.i - 1, pos.j});
+		}
+		else if (maze[pos.i - 1][pos.j] == 's')
+		{
+			return true;
 		}
 	}
 
@@ -152,6 +164,7 @@ bool walk(pos_t pos)
 		// Caso não esteja, pegar o primeiro valor de  valid_positions, remove-lo e chamar a funçao walk com esse valor
 		pos_t next_position = valid_positions.top();
 		valid_positions.pop();
+		std::cout << "Position: (" << next_position.i << ", " << next_position.j << ")\n";
 		walk(next_position);
 	}
 	else
@@ -163,8 +176,9 @@ bool walk(pos_t pos)
 
 int main(int argc, char *argv[])
 {
+	system("clear");
 	// carregar o labirinto com o nome do arquivo recebido como argumento
-	pos_t initial_pos = load_maze(argv[1]);
+	pos_t initial_pos = load_maze("../data/maze.txt");
 	print_maze();
 	// chamar a função de navegação
 	bool exit_found = walk(initial_pos);
