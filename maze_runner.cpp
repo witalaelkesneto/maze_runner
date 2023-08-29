@@ -55,7 +55,7 @@ pos_t load_maze(const char *file_name)
 	for (int i = 0; i < num_rows; ++i)
 	{
 		// Aloca cada linha da matriz
-		maze[i] = (char *)malloc(num_cols * sizeof(char *));
+		maze[i] = (char *)malloc(num_cols * sizeof(char));
 	}
 
 	for (int i = 0; i < num_rows; ++i)
@@ -113,7 +113,7 @@ bool walk(pos_t pos)
 			- pos.i-1, pos.j
 		Caso alguma das posiçÕes validas seja igual a 's', retornar verdadeiro
 	*/
-	if (pos.j + 1 <= num_rows)
+	if (pos.j + 1 < num_cols)
 	{
 		if (maze[pos.i][pos.j + 1] == 'x')
 		{
@@ -135,7 +135,7 @@ bool walk(pos_t pos)
 			return true;
 		}
 	}
-	if (pos.i + 1 <= num_cols)
+	if (pos.i + 1 < num_rows)
 	{
 		if (maze[pos.i + 1][pos.j] == 'x')
 		{
@@ -164,7 +164,6 @@ bool walk(pos_t pos)
 		// Caso não esteja, pegar o primeiro valor de  valid_positions, remove-lo e chamar a funçao walk com esse valor
 		pos_t next_position = valid_positions.top();
 		valid_positions.pop();
-		std::cout << "Position: (" << next_position.i << ", " << next_position.j << ")\n";
 		walk(next_position);
 	}
 	else
@@ -183,6 +182,14 @@ int main(int argc, char *argv[])
 	// chamar a função de navegação
 	bool exit_found = walk(initial_pos);
 	// Tratar o retorno (imprimir mensagem)
+	if (exit_found)
+	{
+		std::cout << "Saída encontrada" << std::endl;
+	}
+	else
+	{
+		std::cout << "Não existem mais caminhos disponíveis" << std::endl;
+	}
 
 	return 0;
 }
