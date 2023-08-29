@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <stack>
 #include <fstream>
+#include <thread>
+#include <chrono>
 
 // Matriz de char representnado o labirinto
 char **maze; // Voce também pode representar o labirinto como um vetor de vetores de char (vector<vector<char>>)
@@ -63,6 +65,11 @@ pos_t load_maze(const char *file_name)
 			// Le o valor da linha i+1,j do arquivo e salva na posição maze[i][j]
 			maze[i][j] = fgetc(file);
 			// Se o valor for 'e' salvar o valor em initial_pos
+			if (maze[i][j] == 'e')
+			{
+				initial_pos.i = i;
+				initial_pos.j = j;
+			}
 		}
 		fgetc(file);
 	}
@@ -78,8 +85,8 @@ void print_maze()
 		{
 			printf("%c", maze[i][j]);
 		}
-		printf("\n");
 	}
+	printf("\n");
 }
 
 // Função responsável pela navegação.
@@ -89,8 +96,12 @@ bool walk(pos_t pos)
 
 	// Repita até que a saída seja encontrada ou não existam mais posições não exploradas
 	// Marcar a posição atual com o símbolo '.'
+	maze[pos.i][pos.j] = '.';
 	// Limpa a tela
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+	system("clear");
 	// Imprime o labirinto
+	print_maze();
 
 	/* Dado a posição atual, verifica quais sao as próximas posições válidas
 		Checar se as posições abaixo são validas (i>0, i<num_rows, j>0, j <num_cols)
@@ -102,16 +113,52 @@ bool walk(pos_t pos)
 			- pos.i-1, pos.j
 		Caso alguma das posiçÕes validas seja igual a 's', retornar verdadeiro
 	*/
+	if (pos.j + 1 <= 49)
+	{
+		if (maze[pos.i][pos.j + 1] == 'x')
+		{
+			valid_positions.push(pos);
+		}
+		else if (maze[pos.i][pos.j + 1] == 's')
+		{
+			return true;
+		}
+	}
+	if (pos.j - 1 >= 1)
+	{
+		if (maze[pos.i][pos.j - 1] == 'x')
+		{
+			valid_positions.push(pos);
+		}
+	}
+	if (pos.i + 1 <= 20)
+	{
+		if (maze[pos.i + 1][pos.j] == 'x')
+		{
+			valid_positions.push(pos);
+		}
+	}
+	if (pos.i - 1 >= 0)
+	{
+		if (maze[pos.i - 1][pos.j] == 'x')
+		{
+			valid_positions.push(pos);
+		}
+	}
 
 	// Verifica se a pilha de posições nao esta vazia
-	// Caso não esteja, pegar o primeiro valor de  valid_positions, remove-lo e chamar a funçao walk com esse valor
-	// Caso contrario, retornar falso
 	if (!valid_positions.empty())
 	{
+		// Caso não esteja, pegar o primeiro valor de  valid_positions, remove-lo e chamar a funçao walk com esse valor
 		pos_t next_position = valid_positions.top();
 		valid_positions.pop();
+		walk(next_position);
 	}
-	return false;
+	else
+	{
+		// Caso contrario, retornar falso
+		return false;
+	}
 }
 
 int main(int argc, char *argv[])
@@ -121,7 +168,6 @@ int main(int argc, char *argv[])
 	print_maze();
 	// chamar a função de navegação
 	bool exit_found = walk(initial_pos);
-
 	// Tratar o retorno (imprimir mensagem)
 
 	return 0;
