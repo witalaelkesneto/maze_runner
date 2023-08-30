@@ -63,15 +63,14 @@ pos_t load_maze(const char *file_name)
 		for (int j = 0; j < num_cols; ++j)
 		{
 			// Le o valor da linha i+1,j do arquivo e salva na posição maze[i][j]
-			maze[i][j] = fgetc(file);
-			// Se o valor for 'e' salvar o valor em initial_pos
+			fscanf(file, " %c", &maze[i][j]);
+			//  Se o valor for 'e' salvar o valor em initial_pos
 			if (maze[i][j] == 'e')
 			{
 				initial_pos.i = i;
 				initial_pos.j = j;
 			}
 		}
-		fgetc(file);
 	}
 	return initial_pos;
 }
@@ -85,8 +84,8 @@ void print_maze()
 		{
 			printf("%c", maze[i][j]);
 		}
+		printf("\n");
 	}
-	printf("\n");
 }
 
 // Função responsável pela navegação.
@@ -94,11 +93,10 @@ void print_maze()
 bool walk(pos_t pos)
 {
 	// Repita até que a saída seja encontrada ou não existam mais posições não exploradas
-
 	// Marcar a posição atual com o símbolo '.'
 	maze[pos.i][pos.j] = '.';
 	// Limpa a tela
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+	std::this_thread::sleep_for(std::chrono::milliseconds(20));
 	system("clear");
 	// Imprime o labirinto
 	print_maze();
@@ -177,8 +175,7 @@ int main(int argc, char *argv[])
 {
 	system("clear");
 	// carregar o labirinto com o nome do arquivo recebido como argumento
-	pos_t initial_pos = load_maze("../data/maze.txt");
-	print_maze();
+	pos_t initial_pos = load_maze("../data/maze7.txt");
 	// chamar a função de navegação
 	bool exit_found = walk(initial_pos);
 	// Tratar o retorno (imprimir mensagem)
