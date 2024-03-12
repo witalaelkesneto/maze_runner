@@ -1,5 +1,7 @@
+#include <iostream>
 #include <stdio.h>
 #include <stack>
+#include <fstream>
 #include <thread>
 #include <chrono>
 
@@ -44,8 +46,7 @@ pos_t load_maze(const char *file_name)
 	// Abre o arquivo para leitura (fopen)
 	FILE *file = fopen(file_name, "r");
 
-	// Le o numero de linhas e colunas (fscanf)
-	// e salva em num_rows e num_cols
+	// Le o numero de linhas e colunas (fscanf) e salva em num_rows e num_cols
 	fscanf(file, "%d %d", &num_rows, &num_cols);
 
 	// Aloca a matriz maze (malloc)
@@ -63,7 +64,7 @@ pos_t load_maze(const char *file_name)
 		{
 			// Le o valor da linha i+1,j do arquivo e salva na posição maze[i][j]
 			fscanf(file, " %c", &maze[i][j]);
-			// Se o valor for 'e' salvar o valor em initial_pos
+			//  Se o valor for 'e' salvar o valor em initial_pos
 			if (maze[i][j] == 'e')
 			{
 				initial_pos.i = i;
@@ -88,10 +89,9 @@ void print_maze()
 }
 
 // Função responsável pela navegação.
-// Recebe como entrada a posição initial e retorna um booleando indicando se a saída foi encontrada
+// Recebe como entrada a posição inicial e retorna um booleano indicando se a saída foi encontrada
 bool walk(pos_t pos)
 {
-
 	// Repita até que a saída seja encontrada ou não existam mais posições não exploradas
 	// Marcar a posição atual com o símbolo '.'
 	maze[pos.i][pos.j] = '.';
@@ -111,62 +111,82 @@ bool walk(pos_t pos)
 			- pos.i-1, pos.j
 		Caso alguma das posiçÕes validas seja igual a 's', retornar verdadeiro
 	*/
-	if(pos.j + 1 < num_cols){
-		if(maze[pos.i][pos.j + 1] == 'x'){
+	if (pos.j + 1 < num_cols)
+	{
+		if (maze[pos.i][pos.j + 1] == 'x')
+		{
 			valid_positions.push({pos.i, pos.j + 1});
 		}
-		if(maze[pos.i][pos.j + 1] == 's'){
+		else if (maze[pos.i][pos.j + 1] == 's')
+		{
 			return true;
 		}
 	}
-
-	if(pos.j - 1 >= 0){
-		if(maze[pos.i][pos.j - 1] == 'x'){
+	if (pos.j - 1 >= 0)
+	{
+		if (maze[pos.i][pos.j - 1] == 'x')
+		{
 			valid_positions.push({pos.i, pos.j - 1});
 		}
-		if(maze[pos.i][pos.j - 1] == 's'){
+		else if (maze[pos.i][pos.j - 1] == 's')
+		{
 			return true;
 		}
 	}
-
-	if(pos.i + 1 < num_rows){
-		if(maze[pos.i - 1][pos.j] == 'x'){
-			valid_positions.push({pos.i - 1, pos.j});
+	if (pos.i + 1 < num_rows)
+	{
+		if (maze[pos.i + 1][pos.j] == 'x')
+		{
+			valid_positions.push({pos.i + 1, pos.j});
 		}
-		if(maze[pos.i - 1][pos.j] == 's'){
+		else if (maze[pos.i + 1][pos.j] == 's')
+		{
 			return true;
 		}
 	}
-
-	if(pos.i - 1 >= 0){
-		if(maze[pos.i - 1][pos.j] == 'x'){
+	if (pos.i - 1 >= 0)
+	{
+		if (maze[pos.i - 1][pos.j] == 'x')
+		{
 			valid_positions.push({pos.i - 1, pos.j});
 		}
-		if(maze[pos.i - 1][pos.j] == 's'){
+		else if (maze[pos.i - 1][pos.j] == 's')
+		{
 			return true;
 		}
 	}
 
 	// Verifica se a pilha de posições nao esta vazia
-	// Caso não esteja, pegar o primeiro valor de  valid_positions, remove-lo e chamar a funçao walk com esse valor
-	// Caso contrario, retornar falso
 	if (!valid_positions.empty())
 	{
+		// Caso não esteja, pegar o primeiro valor de  valid_positions, remove-lo e chamar a funçao walk com esse valor
 		pos_t next_position = valid_positions.top();
 		valid_positions.pop();
 		walk(next_position);
 	}
-	return false;
+	else
+	{
+		// Caso contrario, retornar falso
+		return false;
+	}
 }
 
 int main(int argc, char *argv[])
 {
+	system("clear");
 	// carregar o labirinto com o nome do arquivo recebido como argumento
 	pos_t initial_pos = load_maze("../data/maze.txt");
 	// chamar a função de navegação
 	bool exit_found = walk(initial_pos);
-
 	// Tratar o retorno (imprimir mensagem)
+	if (exit_found)
+	{
+		std::cout << "Saída encontrada" << std::endl;
+	}
+	else
+	{
+		std::cout << "Não existem mais caminhos disponíveis" << std::endl;
+	}
 
 	return 0;
 }
